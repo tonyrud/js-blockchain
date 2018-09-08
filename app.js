@@ -1,15 +1,29 @@
 const express = require('express')
 const app = express()
+const port = process.argv[2] || 3000
 const bodyparser = require('body-parser')
 const Block = require('./block')
 const BlockChain = require('./blockchain')
+const BlockchainNode = require('./BlockchainNode')
 const Transaction = require('./transaction')
 
 let transactions = []
+let nodes = []
 const genesisBlock = new Block()
 const blockchain = new BlockChain(genesisBlock)
 
-app.use(bodyparser.json)
+app.use(bodyparser.json())
+
+app.post('/nodes/register', (req, res) => {
+  const nodesList = req.body.urls
+  nodes = nodesList.map(node => new BlockchainNode(node.url))
+
+  res.json(nodes)
+})
+
+app.get('/nodes', (req, res) => {
+  res.json(nodes)
+})
 
 app.get('/', (req, res) => {
   res.send('server running!')
@@ -18,12 +32,11 @@ app.get('/', (req, res) => {
 app.get('/mine', (req, res) => {
   const block = blockchain.getNextBlock(transactions)
   blockchain.addBlock(block)
+  transactions = []
   res.json(block)
 })
 
 app.post('/transactions', (req, res) => {
-  console.log('creating transaction')
-
   const { to, from, amount } = req.body
 
   const transaction = new Transaction(from, to, amount)
@@ -37,6 +50,6 @@ app.get('/blockchain', (req, res) => {
   res.json(blockchain)
 })
 
-app.listen(3000, () => {
-  console.log('server started on port 3000')
+app.listen(port, () => {
+  console.log(`server started on port ${port}`)
 })
