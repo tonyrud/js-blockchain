@@ -2,8 +2,10 @@ const express = require('express')
 const app = express()
 const port = process.argv[2] || 3000
 const fetch = require('node-fetch')
+const sha256 = require('js-sha256')
 const bodyparser = require('body-parser')
 const Block = require('./block')
+const DrivingRecordSmartContract = require('./smartContracts')
 const BlockChain = require('./blockchain')
 const BlockchainNode = require('./BlockchainNode')
 const Transaction = require('./transaction')
@@ -52,9 +54,17 @@ app.get('/mine', (req, res) => {
 })
 
 app.post('/transactions', (req, res) => {
-  const { to, from, amount } = req.body
+  const { driverLicenseNumber, violationDate, violationType } = req.body
 
-  const transaction = new Transaction(from, to, amount)
+  const drivingRecordSmartContract = new DrivingRecordSmartContract()
+
+  const transaction = new Transaction(
+    sha256(driverLicenseNumber),
+    violationDate,
+    violationType,
+  )
+
+  drivingRecordSmartContract.apply(transaction, blockchain.blocks)
 
   transactions.push(transaction)
 

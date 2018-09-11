@@ -17,8 +17,6 @@ class BlockChain {
   }
 
   getNextBlock(transactions) {
-    console.log('mining transactions: ', transactions)
-
     let block = new Block()
 
     transactions.forEach(transaction => {
@@ -44,7 +42,7 @@ class BlockChain {
     while (!hash.startsWith('000')) {
       block.nonce += 1
       hash = sha256(block.key)
-      // console.log(hash)
+      console.log(hash)
     }
 
     return hash
