@@ -16,6 +16,17 @@ class BlockChain {
     this.blocks.push(block)
   }
 
+  transactionsByDrivingLicenseNumber(drivingLicenseNumber) {
+    let transactions
+    this.blocks.forEach(block => {
+      transactions = block.transactions.filter(
+        transaction => drivingLicenseNumber === transaction.driverLicenseNumber,
+      )
+    })
+
+    return transactions
+  }
+
   getNextBlock(transactions) {
     let block = new Block()
 

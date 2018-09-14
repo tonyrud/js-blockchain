@@ -28,6 +28,16 @@ app.get('/nodes', (req, res) => {
   res.json(nodes)
 })
 
+app.get('/driving-records/:drivingLicenseNumber', (req, res) => {
+  const { drivingLicenseNumber } = req.params
+
+  const transactions = blockchain.transactionsByDrivingLicenseNumber(
+    sha256(drivingLicenseNumber),
+  )
+
+  res.json(transactions)
+})
+
 app.get('/resolve', (req, res) => {
   nodes.forEach(node => {
     fetch(node.url + '/blockchain')
